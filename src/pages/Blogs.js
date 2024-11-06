@@ -23,7 +23,13 @@ export default function Blogs() {
         })
             .then(res => res.json())
             .then(data => {
-                setBlogs(Array.isArray(data.blogs) ? data.blogs : []);  // Ensure blogs is an array
+                // Check if data.blogs exists and is an array
+                if (data && Array.isArray(data.blogs)) {
+                    setBlogs(data.blogs);
+                } else {
+                    console.error("Unexpected data format:", data);
+                    setBlogs([]);
+                }
             })
             .catch(err => console.error("Failed to fetch blogs:", err));
     };
@@ -47,10 +53,11 @@ export default function Blogs() {
                 body: JSON.stringify({ name: blogName })
             });
             const data = await response.json();
-            if (response.ok) {
-                setSearchResults(Array.isArray(data.blogs) ? data.blogs : []); // Ensure searchResults is an array
+            if (response.ok && Array.isArray(data.blogs)) {
+                setSearchResults(data.blogs);
             } else {
-                console.error('Error searching for blogs:', data.message);
+                console.error('Error searching for blogs:', data.message || "Unexpected data format");
+                setSearchResults([]);
             }
         } catch (error) {
             console.error('Error searching for blogs by name:', error);
@@ -89,19 +96,21 @@ export default function Blogs() {
                         </Form>
 
                         <h1 className="mt-4 text-center">Search Results</h1>
-                        {searchResults.length > 0 ? (
+                        {searchResults && searchResults.length > 0 ? (
                             <ListGroup>
                                 {searchResults.map((blog) => (
-                                    <ListGroup.Item key={blog._id || blog.title || Math.random()}>
-                                        <h5>{blog.title || "Untitled"}</h5>
-                                        <p>Description: {blog.content || "No content available"}</p>
-                                        <p>Author: {blog.author?.name || "Unknown"}</p>
-                                        <p>Created on: {
-                                            blog.createdAt 
-                                                ? new Date(blog.createdAt).toLocaleDateString()
-                                                : "Date not available"
-                                        }</p>
-                                    </ListGroup.Item>
+                                    blog && blog._id && ( // Ensure each blog object and _id exist
+                                        <ListGroup.Item key={blog._id}>
+                                            <h5>{blog.title || "Untitled"}</h5>
+                                            <p>Description: {blog.content || "No content available"}</p>
+                                            <p>Author: {blog.author?.name || "Unknown"}</p>
+                                            <p>Created on: {
+                                                blog.createdAt 
+                                                    ? new Date(blog.createdAt).toLocaleDateString()
+                                                    : "Date not available"
+                                            }</p>
+                                        </ListGroup.Item>
+                                    )
                                 ))}
                             </ListGroup>
                         ) : (
