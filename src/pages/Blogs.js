@@ -94,9 +94,9 @@ return (
                     {searchResults.length > 0 ? (
                         <ListGroup>
                             {searchResults.map((blog) => (
-                                <ListGroup.Item key={blog._id}>
-                                    <h5>{blog.title}</h5>
-                                    <p>Description: {blog.content}</p>
+                                <ListGroup.Item key={blog._id || Math.random()}>
+                                    <h5>{blog.title || "Untitled"}</h5>
+                                    <p>Description: {blog.content || "No content available"}</p>
                                     <p>Author: {blog.author?.name || "Unknown"}</p>
                                     <p>Created on: {
                                         blog.createdAt 
