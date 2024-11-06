@@ -1,8 +1,9 @@
 // src/pages/Blogs.js
 import { useState, useEffect, useContext } from 'react';
-import { Form, Button, ListGroup, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, ListGroup, Container, Row, Col, Modal } from 'react-bootstrap';
 import UserContext from '../context/UserContext';
 import UserView from '../components/UserView';
+import BlogDetails from '../components/BlogDetails'; // Ensure this component is available
 import AdminView from '../components/AdminView';
 import { Notyf } from 'notyf';
 import '../App.css';
@@ -13,23 +14,19 @@ export default function Blogs() {
 
     const [blogs, setBlogs] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
-    const [blogName, setBlogName] = useState('');
+    const [blogTitle, setBlogTitle] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [selectedBlog, setSelectedBlog] = useState(null);
 
     // Fetch active blogs
     const fetchBlogs = () => {
-        const fetchURL = `${process.env.REACT_APP_API_BASE_URL}/blogs/getAllBlogs`;
+        const fetchURL = `${process.env.REACT_APP_API_URL}/blogs/getAllBlogs`;
         fetch(fetchURL, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
             .then(res => res.json())
             .then(data => {
-                // Check if data.blogs exists and is an array
-                if (data && Array.isArray(data.blogs)) {
-                    setBlogs(data.blogs);
-                } else {
-                    console.error("Unexpected data format:", data);
-                    setBlogs([]);
-                }
+                setBlogs(data.blogs || []);
             })
             .catch(err => console.error("Failed to fetch blogs:", err));
     };
@@ -40,55 +37,65 @@ export default function Blogs() {
         }
     }, [user]);
 
-    const handleSearchByName = async (e) => {
+    const handleSearchByTitle = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/search-by-name`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/blogs/search-by-title`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ name: blogName })
+                body: JSON.stringify({ title: blogTitle })
             });
             const data = await response.json();
-            if (response.ok && Array.isArray(data.blogs)) {
-                setSearchResults(data.blogs);
+            if (response.ok) {
+                setSearchResults(data);
             } else {
-                console.error('Error searching for blogs:', data.message || "Unexpected data format");
-                setSearchResults([]);
+                console.error('Error searching for blogs:', data.message);
             }
         } catch (error) {
-            console.error('Error searching for blogs by name:', error);
+            console.error('Error searching for blogs by title:', error);
         }
     };
 
     const handleClear = () => {
-        setBlogName('');
+        setBlogTitle('');
         setSearchResults([]);
+    };
+
+    // Modal functions
+    const handleShowModal = (blog) => {
+        setSelectedBlog(blog);
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedBlog(null);
     };
 
     return (
         <Container>
             <div>
-                {user && user.isAdmin ? (
+                {user !== null && user.isAdmin ? (
                     <AdminView blogsData={blogs} fetchData={fetchBlogs} />
                 ) : (
                     <>
                         <h1 className="text-center">Blog Search</h1>
                         <Form>
-                            <Form.Group controlId="blogName">
-                                <Form.Label>Blog Name</Form.Label>
+                            <Form.Group controlId="blogTitle">
+                                <Form.Label>Blog Title</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={blogName}
-                                    onChange={(e) => setBlogName(e.target.value)}
-                                    placeholder="Enter blog name"
+                                    value={blogTitle}
+                                    onChange={(e) => setBlogTitle(e.target.value)}
+                                    placeholder="Enter blog title"
                                 />
                             </Form.Group>
-                            <Button onClick={handleSearchByName} className="mt-3 me-2">
-                                Search by Name
+                            <Button onClick={handleSearchByTitle} className="mt-3 me-2">
+                                Search by Title
                             </Button>
                             <Button onClick={handleClear} className="mt-3">
                                 Clear
@@ -96,21 +103,18 @@ export default function Blogs() {
                         </Form>
 
                         <h1 className="mt-4 text-center">Search Results</h1>
-                        {searchResults && searchResults.length > 0 ? (
+                        {searchResults.length > 0 ? (
                             <ListGroup>
                                 {searchResults.map((blog) => (
-                                    blog && blog._id && ( // Ensure each blog object and _id exist
-                                        <ListGroup.Item key={blog._id}>
-                                            <h5>{blog.title || "Untitled"}</h5>
-                                            <p>Description: {blog.content || "No content available"}</p>
-                                            <p>Author: {blog.author?.name || "Unknown"}</p>
-                                            <p>Created on: {
-                                                blog.createdAt 
-                                                    ? new Date(blog.createdAt).toLocaleDateString()
-                                                    : "Date not available"
-                                            }</p>
-                                        </ListGroup.Item>
-                                    )
+                                    <ListGroup.Item key={blog._id}>
+                                        <h5>{blog.title}</h5>
+                                        <p>Author: {blog.author}</p>
+                                        <p>Created: {new Date(blog.createdAt).toLocaleDateString()}</p>
+                                        <p>Description: {blog.description}</p>
+                                        <Button variant="primary" onClick={() => handleShowModal(blog)}>
+                                            Details
+                                        </Button>
+                                    </ListGroup.Item>
                                 ))}
                             </ListGroup>
                         ) : (
@@ -123,6 +127,21 @@ export default function Blogs() {
                             </Col>
                         </Row>
                         <UserView blogsData={blogs} />
+
+                        {/* Modal for Blog Details */}
+                        <Modal show={showModal} onHide={handleCloseModal}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>{selectedBlog?.title}</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {selectedBlog && <BlogDetails blog={selectedBlog} />}
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleCloseModal}>
+                                    Close
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </>
                 )}
             </div>
