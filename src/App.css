@@ -9,7 +9,7 @@
 .extreme-brand {
     font-size: 1.8rem;
     color: #ffeb3b; /* Yellow text color */
-    text-shadow: 1px 1px 2px #d32d2d; /* Text shadow for depth */
+    text-shadow: 1px 1px 2px #470808; /* Text shadow for depth */
 }
 
 /* Navbar link styling */
@@ -22,8 +22,8 @@
 
 /* Hover effects for navbar links */
 .extreme-link:hover {
-    color: #fff !important; /* Change to white on hover */
-    background-color: rgba(255, 235, 59, 0.3); /* Light background on hover */
+    color: #06e07b !important; /* Change to white on hover */
+    background-color: rgba(238, 215, 8, 0.3); /* Light background on hover */
     border-radius: 5px; /* Rounded corners on hover */
 }
 
