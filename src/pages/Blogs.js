@@ -1,4 +1,3 @@
-// src/pages/Blogs.js
 import { useState, useEffect, useContext } from 'react';
 import { Form, Button, ListGroup, Container, Row, Col, Modal } from 'react-bootstrap';
 import UserContext from '../context/UserContext';
@@ -20,15 +19,23 @@ export default function Blogs() {
 
     // Fetch active blogs
     const fetchBlogs = () => {
-        const fetchURL = `${process.env.REACT_APP_API_URL}/blogs/getAllBlogs`;
+        const fetchURL = `${process.env.REACT_APP_API_BASE_URL}/blogs/getAllBlogs`;
         fetch(fetchURL, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
-            .then(res => res.json())
-            .then(data => {
-                setBlogs(data.blogs || []);
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch: ${res.statusText}`);
+                }
+                return res.json();
             })
-            .catch(err => console.error("Failed to fetch blogs:", err));
+            .then(data => {
+                setBlogs(data.blogs || []);  // Ensuring we set blogs properly
+            })
+            .catch(err => {
+                console.error("Failed to fetch blogs:", err);
+                alert("An error occurred while fetching blogs.");
+            });
     };
 
     useEffect(() => {
@@ -51,7 +58,7 @@ export default function Blogs() {
             });
             const data = await response.json();
             if (response.ok) {
-                setSearchResults(data);
+                setSearchResults(data);  // Assuming this returns the correct data structure
             } else {
                 console.error('Error searching for blogs:', data.message);
             }

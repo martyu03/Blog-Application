@@ -1,15 +1,18 @@
+/* Navbar styling */
 .extreme-navbar {
     background: linear-gradient(135deg, #d32d2d 0%, #c2185b 100%); /* Gradient background */
     padding: 10px 20px; /* Padding for the navbar */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
 }
 
+/* Brand text styling */
 .extreme-brand {
     font-size: 1.8rem;
     color: #ffeb3b; /* Yellow text color */
     text-shadow: 1px 1px 2px #d32d2d; /* Text shadow for depth */
 }
 
+/* Navbar link styling */
 .extreme-link {
     color: #ffeb3b !important; /* Yellow links */
     padding: 0.5rem 1rem;
@@ -17,26 +20,56 @@
     position: relative;
 }
 
+/* Hover effects for navbar links */
 .extreme-link:hover {
     color: #fff !important; /* Change to white on hover */
     background-color: rgba(255, 235, 59, 0.3); /* Light background on hover */
     border-radius: 5px; /* Rounded corners on hover */
 }
 
+/* Active link styling */
+.extreme-link.active {
+    font-weight: bold;
+    background-color: rgba(255, 235, 59, 0.5); /* Slightly more pronounced active state */
+}
+
+/* Navbar collapse behavior */
 .navbar-collapse {
     justify-content: flex-end; /* Align items to the right */
 }
 
-/* Add some festive animations */
+/* Sparkle animation */
 @keyframes sparkle {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
 }
 
 .sparkle {
-  animation: sparkle 1.5s infinite; /* Sparkle animation */
+    animation: sparkle 1.5s infinite; /* Sparkle animation */
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .extreme-navbar {
+        padding: 5px 10px; /* Reduced padding on smaller screens */
+    }
+
+    .extreme-link {
+        padding: 0.5rem;  /* Adjust padding for smaller devices */
+    }
+}
+
+/* Focus styles for links for better accessibility */
+.extreme-link:focus {
+    outline: 2px solid #ffeb3b;
+}
+
+/* Ensure active link reflects the correct state when clicked */
+.extreme-link:active {
+    color: #fff !important;
+    background-color: rgba(255, 235, 59, 0.5); /* Slightly more pronounced active state */
 }

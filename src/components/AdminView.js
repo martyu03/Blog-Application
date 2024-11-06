@@ -52,11 +52,14 @@ const AdminView = ({ blogsData, fetchData }) => {
                 setTitle('');
                 setContent('');
                 setAuthor('');
-                fetchData();
+                fetchData(); // Call fetchData only after a successful response
                 setShowModal(false);
             } else {
                 notyf.error('Failed to add blog');
             }
+        })
+        .catch(error => {
+            notyf.error('An error occurred while adding the blog');
         });
     };
 
@@ -85,17 +88,20 @@ const AdminView = ({ blogsData, fetchData }) => {
                 setTitle('');
                 setContent('');
                 setAuthor('');
-                fetchData();
+                fetchData(); // Call fetchData only after a successful response
                 setShowEditModal(false);
             } else {
                 notyf.error('Failed to update blog');
             }
+        })
+        .catch(error => {
+            notyf.error('An error occurred while updating the blog');
         });
     };
 
     const handleDelete = (blogId) => {
         if (window.confirm("Are you sure you want to delete this blog?")) {
-            fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/deleteBlog/${blogId}`, {
+            fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/deleteBlog/${selectedBlogId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -105,10 +111,13 @@ const AdminView = ({ blogsData, fetchData }) => {
             .then(data => {
                 if (data.message === 'Blog deleted successfully') {
                     notyf.success('Blog Deleted');
-                    fetchData();
+                    fetchData(); // Call fetchData only after a successful response
                 } else {
                     notyf.error('Failed to delete blog');
                 }
+            })
+            .catch(error => {
+                notyf.error('An error occurred while deleting the blog');
             });
         }
     };
@@ -119,27 +128,32 @@ const AdminView = ({ blogsData, fetchData }) => {
     };
 
     const handleCommentSubmit = (e) => {
-        e.preventDefault();
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/addComment/${selectedBlogId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ comment })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data) {
-                notyf.success('Comment Added');
-                setComment('');
-                fetchData();
-                setShowCommentModal(false);
-            } else {
-                notyf.error('Failed to add comment');
-            }
-        });
-    };
+    e.preventDefault();
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/addComment/${selectedBlogId}`, {  // Change here
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ comment })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data) {
+            console.log(data);
+            notyf.success('Comment Added');
+            setComment('');
+            fetchData(); // Call fetchData only after a successful response
+            setShowCommentModal(false);
+        } else {
+            notyf.error('Failed to add comment');
+        }
+    })
+    .catch(error => {
+        notyf.error('An error occurred while adding the comment');
+    });
+};
+
 
     if (!isAdmin) {
         return <h2 className="text-center my-5">Access Denied. You must be an admin to view this page.</h2>;
@@ -268,50 +282,35 @@ const AdminView = ({ blogsData, fetchData }) => {
                         </Form.Group>
                         <div className="text-center mt-3">
                             <Button variant="primary" type="submit">
-                                Submit Comment
+                                Submit
                             </Button>
                         </div>
                     </Form>
                 </Modal.Body>
             </Modal>
 
-            {/* Display blogs in cards */}
-            <Row xs={1} md={2} lg={3} className="g-4">
-                {Array.isArray(blogsData) && blogsData.map((blog) => (
-                    <Col key={blog._id}>
-                        <Card>
-                            <Card.Body>
-                                <Card.Title>{blog.title}</Card.Title>
-                                <Card.Text>
-                                    <strong>Content:</strong> {blog.content}
-                                </Card.Text>
-                                <Card.Text>
-                                    <strong>Author:</strong> {blog.author}
-                                </Card.Text>
-                                <Card.Text>
-                                    <strong>Comments:</strong>
-                                    <ul>
-                                        {blog.comments.map((cmt) => (
-                                            <li key={cmt._id}>
-                                                {cmt.comment} {/* Render the comment text here */}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </Card.Text>
-                                <Button variant="primary" onClick={() => handleEdit(blog)}>
-                                    Edit
-                                </Button>
-                                <Button variant="danger" onClick={() => handleDelete(blog._id)}>
-                                    Delete
-                                </Button>
-                                <Button variant="info" onClick={() => handleShowCommentModal(blog._id)}>
-                                    Add Comment
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
+            {/* List of blogs */}
+            <Row>
+    {blogsData.map((blog) => (
+        <Col key={blog._id} sm={12} md={6} lg={4}>
+            <Card className="my-3">
+                <Card.Body>
+    <Card.Title>{blog.title}</Card.Title>
+    <Card.Text>{blog.content.substring(0, 100)}...</Card.Text>
+    <Card.Text><strong>Author:</strong> {blog.author ? blog.author.name : 'Unknown'}</Card.Text> {/* Safely accessing author */}
+    <Card.Text><strong>Creation Date:</strong> {new Date(blog.creationDate).toLocaleDateString()}</Card.Text> {/* Safely formatting the creation date */}
+    <div className="text-center">
+        <Button variant="warning" onClick={() => handleEdit(blog)}>Edit</Button>
+        <Button variant="danger" onClick={() => handleDelete(blog._id)} className="ms-2">Delete</Button>
+        <Button variant="info" onClick={() => handleShowCommentModal(blog._id)} className="ms-2">Comment</Button>
+    </div>
+</Card.Body>
+
+            </Card>
+        </Col>
+    ))}
+</Row>
+
         </div>
     );
 };
