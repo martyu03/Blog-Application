@@ -1,3 +1,4 @@
+// src/components/AddComment.js
 import { useState, useEffect } from 'react';
 import { Button, Form, Spinner } from 'react-bootstrap';
 import { Notyf } from 'notyf';
