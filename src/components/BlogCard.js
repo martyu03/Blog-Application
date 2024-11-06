@@ -7,28 +7,25 @@ export default function BlogCard({ blogProp }) {
         return <div>No blog data available</div>;
     }
 
-    console.log('Blog data:', blogProp);
+  console.log('Blog data:', blogProp);
 
-    const { title, content, author, creationDate, comment, _id } = blogProp;
+    const { title, content, author, createdAt, comments, _id } = blogProp;
 
     return (
         <Card>
             <Card.Body>
-                {/* Displaying title instead of name */}
                 <Card.Title>{title}</Card.Title>
-                {/* Display author */}
-                <Card.Subtitle className="mb-2 text-muted">Author: {author}</Card.Subtitle>
-                {/* Display creation date */}
-                <Card.Subtitle className="mb-2 text-muted">Created on: {new Date(creationDate).toLocaleDateString()}</Card.Subtitle>
-                {/* Display content */}
+                <Card.Subtitle className="mb-2 text-muted">Author: {_id}</Card.Subtitle>
+                <Card.Subtitle className="mb-2 text-muted">Content: {content}</Card.Subtitle>
+                <Card.Subtitle className="mb-2 text-muted">Comment: {comments.length}</Card.Subtitle>
+                <Card.Subtitle className="mb-2 text-muted">Created on: {new Date(createdAt).toLocaleDateString()}</Card.Subtitle>
                 <Card.Text>{content}</Card.Text>
-                {/* Display comment if available */}
-                {comment && (
+                {/* {comments && (
                     <>
-                        <Card.Subtitle>Comment:</Card.Subtitle>
-                        <Card.Text>{comment}</Card.Text>
+                        <Card.Subtitle>comments:</Card.Subtitle>
+                        <Card.Text>{comments}</Card.Text>
                     </>
-                )}
+                )} */}
                 <Link className="btn btn-primary" to={`/blogs/${_id}`}>Details</Link>
             </Card.Body>
         </Card>

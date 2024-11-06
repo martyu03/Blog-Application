@@ -101,7 +101,7 @@ const AdminView = ({ blogsData, fetchData }) => {
 
     const handleDelete = (blogId) => {
         if (window.confirm("Are you sure you want to delete this blog?")) {
-            fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/deleteBlog/${selectedBlogId}`, {
+            fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/deleteBlog/${blogId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`

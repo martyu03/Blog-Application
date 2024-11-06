@@ -67,8 +67,8 @@ export default function BlogDetails() {
                             <Card.Subtitle>Author:</Card.Subtitle>
 
                             <div className='d-flex justify-content-between'>
-                                <Card.Text>{blog.author.username} ({blog.author.email})</Card.Text>
-                                <Card.Text>{new Date(blog.creationDate).toLocaleString()}</Card.Text> {/* Show the creation date */}
+                                {/* <Card.Text>{blog.author.username} ({blog.author.email})</Card.Text> */}
+                                <Card.Text>{new Date(blog.createdAt).toLocaleString()}</Card.Text> {/* Show the creation date */}
                             </div>
                         </Card.Body>
                     </Card>
@@ -83,7 +83,7 @@ export default function BlogDetails() {
                                             <Card.Subtitle className='fw-semibold'>
                                                 {formatUserId(comment.username)}
                                             </Card.Subtitle>
-                                            <Card.Text>{new Date(comment.creationDate).toLocaleString()}</Card.Text>
+                                            <Card.Text>{new Date(comment.createdAt).toLocaleString()}</Card.Text>
                                         </div>
                                         
                                         <Card.Text>{comment.comment}</Card.Text>
