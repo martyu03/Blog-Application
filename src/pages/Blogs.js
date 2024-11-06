@@ -23,7 +23,7 @@ export default function Blogs() {
         })
             .then(res => res.json())
             .then(data => {
-                setBlogs(data.blogs || []);
+                setBlogs(Array.isArray(data.blogs) ? data.blogs : []);  // Ensure blogs is an array
             })
             .catch(err => console.error("Failed to fetch blogs:", err));
     };
@@ -48,7 +48,7 @@ export default function Blogs() {
             });
             const data = await response.json();
             if (response.ok) {
-                setSearchResults(data.blogs || []);
+                setSearchResults(Array.isArray(data.blogs) ? data.blogs : []); // Ensure searchResults is an array
             } else {
                 console.error('Error searching for blogs:', data.message);
             }
@@ -62,64 +62,61 @@ export default function Blogs() {
         setSearchResults([]);
     };
 
-    // src/pages/Blogs.js
+    return (
+        <Container>
+            <div>
+                {user && user.isAdmin ? (
+                    <AdminView blogsData={blogs} fetchData={fetchBlogs} />
+                ) : (
+                    <>
+                        <h1 className="text-center">Blog Search</h1>
+                        <Form>
+                            <Form.Group controlId="blogName">
+                                <Form.Label>Blog Name</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={blogName}
+                                    onChange={(e) => setBlogName(e.target.value)}
+                                    placeholder="Enter blog name"
+                                />
+                            </Form.Group>
+                            <Button onClick={handleSearchByName} className="mt-3 me-2">
+                                Search by Name
+                            </Button>
+                            <Button onClick={handleClear} className="mt-3">
+                                Clear
+                            </Button>
+                        </Form>
 
-return (
-    <Container>
-        <div>
-            {user && user.isAdmin ? (
-                <AdminView blogsData={blogs} fetchData={fetchBlogs} />
-            ) : (
-                <>
-                    <h1 className="text-center">Blog Search</h1>
-                    <Form>
-                        <Form.Group controlId="blogName">
-                            <Form.Label>Blog Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={blogName}
-                                onChange={(e) => setBlogName(e.target.value)}
-                                placeholder="Enter blog name"
-                            />
-                        </Form.Group>
-                        <Button onClick={handleSearchByName} className="mt-3 me-2">
-                            Search by Name
-                        </Button>
-                        <Button onClick={handleClear} className="mt-3">
-                            Clear
-                        </Button>
-                    </Form>
+                        <h1 className="mt-4 text-center">Search Results</h1>
+                        {searchResults.length > 0 ? (
+                            <ListGroup>
+                                {searchResults.map((blog) => (
+                                    <ListGroup.Item key={blog._id || blog.title || Math.random()}>
+                                        <h5>{blog.title || "Untitled"}</h5>
+                                        <p>Description: {blog.content || "No content available"}</p>
+                                        <p>Author: {blog.author?.name || "Unknown"}</p>
+                                        <p>Created on: {
+                                            blog.createdAt 
+                                                ? new Date(blog.createdAt).toLocaleDateString()
+                                                : "Date not available"
+                                        }</p>
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        ) : (
+                            <p>No blogs found.</p>
+                        )}
 
-                    <h1 className="mt-4 text-center">Search Results</h1>
-                    {searchResults.length > 0 ? (
-                        <ListGroup>
-                            {searchResults.map((blog) => (
-                                <ListGroup.Item key={blog._id || Math.random()}>
-                                    <h5>{blog.title || "Untitled"}</h5>
-                                    <p>Description: {blog.content || "No content available"}</p>
-                                    <p>Author: {blog.author?.name || "Unknown"}</p>
-                                    <p>Created on: {
-                                        blog.createdAt 
-                                            ? new Date(blog.createdAt).toLocaleDateString()
-                                            : "Date not available"
-                                    }</p>
-                                </ListGroup.Item>
-                            ))}
-                        </ListGroup>
-                    ) : (
-                        <p>No blogs found.</p>
-                    )}
-
-                    <Row>
-                        <Col xs={12} className="mb-4 text-center">
-                            <h1>My Blogs</h1>
-                        </Col>
-                    </Row>
-                    <UserView blogsData={blogs} />
-                </>
-            )}
-        </div>
-    </Container>
-);
-
+                        <Row>
+                            <Col xs={12} className="mb-4 text-center">
+                                <h1>My Blogs</h1>
+                            </Col>
+                        </Row>
+                        <UserView blogsData={blogs} />
+                    </>
+                )}
+            </div>
+        </Container>
+    );
 }
