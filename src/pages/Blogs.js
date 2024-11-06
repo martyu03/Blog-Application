@@ -4,11 +4,9 @@ import UserContext from '../context/UserContext';
 import UserView from '../components/UserView';
 import BlogDetails from '../components/BlogDetails'; // Ensure this component is available
 import AdminView from '../components/AdminView';
-import { Notyf } from 'notyf';
 import '../App.css';
 
 export default function Blogs() {
-    const notyf = new Notyf();
     const { user } = useContext(UserContext);
 
     const [blogs, setBlogs] = useState([]);
@@ -48,7 +46,7 @@ export default function Blogs() {
         e.preventDefault();
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/blogs/search-by-title`, {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/search-by-title`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,7 +56,7 @@ export default function Blogs() {
             });
             const data = await response.json();
             if (response.ok) {
-                setSearchResults(data);  // Assuming this returns the correct data structure
+                setSearchResults(data);
             } else {
                 console.error('Error searching for blogs:', data.message);
             }
@@ -112,17 +110,17 @@ export default function Blogs() {
                         <h1 className="mt-4 text-center">Search Results</h1>
                         {searchResults.length > 0 ? (
                             <ListGroup>
-                                {searchResults.map((blog) => (
-                                    <ListGroup.Item key={blog._id}>
-                                        <h5>{blog.title}</h5>
-                                        <p>Author: {blog.author}</p>
-                                        <p>Created: {new Date(blog.createdAt).toLocaleDateString()}</p>
-                                        <p>Description: {blog.description}</p>
-                                        <Button variant="primary" onClick={() => handleShowModal(blog)}>
-                                            Details
-                                        </Button>
-                                    </ListGroup.Item>
-                                ))}
+                               {searchResults.map((blog, index) => (
+                                    <ListGroup.Item key={blog._id || index}>
+                                    <h5>{blog.title}</h5>
+                                    <p>Author: {blog.author?.username}</p> {/* Access username instead of name */}
+                                    <p>Created: {new Date(blog.createdAt).toLocaleDateString()}</p>
+                                    <p>Description: {typeof blog.description === 'string' ? blog.description : JSON.stringify(blog.description)}</p>
+                                    <Button variant="primary" onClick={() => handleShowModal(blog)}>
+                                        Details
+                                    </Button>
+                                </ListGroup.Item>
+                            ))}
                             </ListGroup>
                         ) : (
                             <p>No blogs found.</p>

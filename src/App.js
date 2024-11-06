@@ -1,4 +1,3 @@
-// src/App.js
 import './App.css';
 import { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
@@ -14,14 +13,14 @@ import Blogs from './pages/Blogs';
 import AddBlog from './pages/AddBlog';
 import AdminView from './components/AdminView';
 import BlogDetails from './components/BlogDetails';
-
 import { useLocation } from 'react-router-dom';
 
 function App() {
     const [user, setUser] = useState({
         id: null,
-        isAdmin: null,
+        username: null,
         email: null,
+        isAdmin: null,
         firstName: null,
         lastName: null,
         mobileNo: null,
@@ -29,6 +28,15 @@ function App() {
 
     const unsetUser = () => {
         localStorage.clear();
+        setUser({
+            id: null,
+            username: null,
+            email: null,
+            isAdmin: null,
+            firstName: null,
+            lastName: null,
+            mobileNo: null,
+        });
     };
 
     const parseJwt = (token) => {
@@ -47,7 +55,9 @@ function App() {
             if (userDetails) {
                 setUser({
                     id: userDetails.id,
+                    username: userDetails.username,
                     email: userDetails.email,
+                    isAdmin: userDetails.isAdmin,
                 });
             }
         }
@@ -67,34 +77,18 @@ function Content() {
     const location = useLocation();
 
     return (
-        <>
-            {location.pathname === '/' ? (
-                <Container fluid>
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/addBlog" element={<AddBlog />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/blogs/:id" element={<BlogDetails />} /> 
-                        <Route path="/blogs" element={<Blogs />} />
-                        <Route path="/logout" element={<Logout />} />
-                        <Route path="*" element={<Error />} />
-                    </Routes>
-                </Container>
-            ) : (
-                <Container>
-                    <Routes>
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/addBlog" element={<AddBlog />} />
-                        <Route path="/blogs/:id" element={<BlogDetails />} /> 
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/blogs" element={<Blogs />} />
-                        <Route path="/logout" element={<Logout />} />
-                        <Route path="*" element={<Error />} />
-                    </Routes>
-                </Container>
-            )}
-        </>
+        <Container fluid>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/addBlog" element={<AddBlog />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/blogs/:id" element={<BlogDetails />} />
+                <Route path="/blogs" element={<Blogs />} />
+                <Route path="/logout" element={<Logout />} />
+                <Route path="*" element={<Error />} />
+            </Routes>
+        </Container>
     );
 }
 

@@ -1,61 +1,58 @@
-// src/components/AddComment.js
 import { useState, useEffect } from 'react';
 import { Button, Form, Spinner } from 'react-bootstrap';
 import { Notyf } from 'notyf';
 
 const notyf = new Notyf();
 
-export default function AddComment({ blogId, onAddComment }) {
+export default function AddComment({ blogId, onAddComment }) { // blogId added here
     const [comment, setComment] = useState('');
     const [isActive, setIsActive] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const userId = localStorage.getItem('userId'); // Make sure this is set correctly when user logs in
+    const username = localStorage.getItem('username');
+    const userId = localStorage.getItem('userId');
 
-    const handleAddComment = async () => {
-    console.log('blogId:', blogId); // Log to check if blogId is defined
-
-    if (!blogId) {
-        console.error('Blog ID is undefined.');
-        notyf.error("Blog ID is missing");
-        return;
-    }
-
-    setIsLoading(true);
-    try {
-        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/addComment/${blogId}`, {
-            method: 'PATCH',
+    const handleAddComment = () => {
+        setIsLoading(true); 
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/addComment/${blogId}`, { // Correct the endpoint here
+            method: 'POST', 
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({ comment })
-        });
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message === 'Comment added successfully.') {
+                    notyf.success("Comment added successfully.");
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText);
-        }
+                    const creationDate = data.post.comments
+                        .filter(comments => comments.userId === userId && comments.comment === comment)
+                        .slice(-1)[0]?.creationDate;
 
-        const data = await response.json();
-        notyf.success("Comment added successfully");
-        onAddComment(data.blog.comments[data.blog.comments.length - 1]);
-        setComment(''); 
-    } catch (err) {
-        console.error('Error adding comment:', err);
-        notyf.error("Failed to add comment");
-    } finally {
-        setIsLoading(false);
-    }
-};
+                    onAddComment({ comment, username, creationDate });
+                    setComment('');
 
+                } else {
+                    notyf.error("Failed to add comment");
+                }
+            })
+            .catch(err => {
+                console.error('Error adding comment:', err);
+                notyf.error("Failed to add comment");
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    };
 
     useEffect(() => {
         setIsActive(comment.trim() !== '');
     }, [comment]);
 
     return (
-        <Form className="mt-2" onSubmit={(e) => { e.preventDefault(); handleAddComment(); }}>
+        <Form className="mt-2">
             <Form.Group controlId="commentTextarea">
                 <Form.Control 
                     as="textarea" 

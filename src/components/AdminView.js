@@ -130,7 +130,7 @@ const AdminView = ({ blogsData, fetchData }) => {
     const handleCommentSubmit = (e) => {
     e.preventDefault();
     fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/addComment/${selectedBlogId}`, {  // Change here
-        method: 'PATCH',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('token')}`

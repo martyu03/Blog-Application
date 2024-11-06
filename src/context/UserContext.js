@@ -9,10 +9,22 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        console.log('Stored token:', token);  // Log to check if the token is present
+        
         if (token) {
             try {
                 const decoded = jwtDecode(token);
-                setUser(decoded); // Set user with decoded token
+                console.log('Decoded token:', decoded); // Log the decoded token to verify its content
+                
+                const currentTime = Date.now() / 1000;  // Get current time in seconds
+                if (decoded.exp < currentTime) {
+                    // Token has expired
+                    console.error('Token has expired');
+                    localStorage.removeItem('token');
+                    setUser(null);  // Reset user state
+                } else {
+                    setUser(decoded); // Set user with decoded token
+                }
             } catch (error) {
                 console.error('Failed to decode token:', error);
                 setUser(null); // Reset user if token is invalid

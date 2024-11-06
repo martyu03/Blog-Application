@@ -5,7 +5,7 @@ import UserContext from '../context/UserContext';
 import { Notyf } from "notyf";
 
 export default function Register() {
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);  // Access UserContext
 
     const [username, setUsername] = useState("");  
     const [email, setEmail] = useState("");
@@ -24,49 +24,56 @@ export default function Register() {
     }, [username, email, password, confirmPassword]);
 
     function registerUser(e) {
-    e.preventDefault();
-    const url = `${process.env.REACT_APP_API_BASE_URL}/users/register`;
-    console.log("Register URL:", url);
-    
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            username, 
-            email,
-            password
+        e.preventDefault();
+        const url = `${process.env.REACT_APP_API_BASE_URL}/users/register`;
+        console.log("Register URL:", url);
+        
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username, 
+                email,
+                password
+            })
         })
-    })
-    .then(res => {
-        if (!res.ok) {
-            return res.json().then(err => { // Parse the error response
-                throw new Error(`HTTP error! status: ${res.status}, message: ${err.message}`);
-            });
-        }
-        return res.json();
-    })
-    .then(data => {
-        console.log(data);
-        if (data.message === "User registered successfully") {
-            // Clear input fields
-            setUsername('');
-            setEmail('');
-            setPassword('');
-            setConfirmPassword('');
-            notyf.success('Registration Successful');
-        } else {
-            notyf.error(data.message || 'Something went wrong');
-        }
-    })
-    .catch(error => {
-        console.error('Error during fetch:', error);
-        notyf.error('An error occurred during registration. Please try again.');
-    });
-}
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { // Parse the error response
+                    throw new Error(`HTTP error! status: ${res.status}, message: ${err.message}`);
+                });
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log(data);
+            if (data.message === "User registered successfully") {
+                // Save user details to context and localStorage
+                const userDetails = { username, email, userId: data.userId };  // Assuming userId is returned
+                setUser(userDetails);  // Set user details in UserContext
+                localStorage.setItem('username', username);  // Save user details to localStorage
+                localStorage.setItem('email', email);
+                localStorage.setItem('userId', data.userId);
+                localStorage.setItem('token', data.token);  // Save the token if available
 
+                // Clear input fields
+                setUsername('');
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+                notyf.success('Registration Successful');
+            } else {
+                notyf.error(data.message || 'Something went wrong');
+            }
+        })
+        .catch(error => {
+            console.error('Error during fetch:', error);
+            notyf.error('An error occurred during registration. Please try again.');
+        });
+    }
 
     // Check if user exists and redirect
-    if (user && user.id) {
+    if (user && user.userId) {
         return <Navigate to="/blogs" />; // Navigate if user is logged in
     }
 
@@ -91,7 +98,7 @@ export default function Register() {
                 <Form.Control type='password' placeholder='Confirm Password' required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
             </Form.Group>
             {
-                isActive ?
+                isActive ? 
                 <Button variant="primary" type="submit" id='submitBtn'>Submit</Button> :
                 <Button className="mt-3" variant="danger" type="submit" id='submitBtn' disabled>Please enter your registration details</Button>
             }

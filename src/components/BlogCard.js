@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function BlogCard({ blogProp }) {
     if (!blogProp) {
-        return <div>No blog data available</div>; 
+        return <div>No blog data available</div>;
     }
 
     console.log('Blog data:', blogProp);
