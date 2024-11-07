@@ -3,18 +3,27 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button } from 'react-bootstrap';
 import Loading from '../components/Loading';
 import AddComment from './AddComment';
+import { Notyf } from 'notyf';
 
 export default function BlogDetails() {
     const { id } = useParams(); // Get the blog ID from URL parameters
     const [blog, setBlog] = useState(null); // State for storing the blog data
     const [comments, setComments] = useState([]); // State for storing blog comments
+    const [isAdmin, setIsAdmin] = useState(false); // State to store whether the user is an admin
+    const notyf = new Notyf();
     
     // Get the token from local storage
     const token = localStorage.getItem('token');
 
     useEffect(() => {
+        // Decode the token to check for the user's role (admin or not)
+        if (token) {
+            const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+            setIsAdmin(decodedToken.isAdmin); // Assuming the JWT has an 'isAdmin' field
+        }
+
         // Fetch the blog post by ID
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/getBlog/${id}`, { // Changed URL to reflect 'blogs'
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/getBlog/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,12 +36,32 @@ export default function BlogDetails() {
                 setComments(data.comments); // Store the blog comments
             })
             .catch(err => console.error('Error fetching blog:', err));
-
     }, [id, token]); // Add token as a dependency to useEffect to refetch if it changes
 
     const handleAddComment = (newComment) => {
         setComments(prevComments => [...prevComments, newComment]); // Add new comment to the list
     };
+
+    const handleDeleteComment = (commentId) => {
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/removeComment/${id}/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data) {
+                    setComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
+                    notyf.success('Comment Deleted');
+                } else {
+                    console.error('Error deleting comment:', data.message);
+                }
+            })
+            .catch(err => console.error('Error deleting comment:', err));
+    };
+    
 
     // Function to format userId for display
     const formatUserId = (userId) => {
@@ -84,6 +113,16 @@ export default function BlogDetails() {
                                         </div>
                                         
                                         <Card.Text>{comment.comment}</Card.Text>
+                                        
+                                        {/* Render delete button only for admin users */}
+                                        {isAdmin && (
+                                            <Button 
+                                                variant="danger" 
+                                                size="sm" 
+                                                onClick={() => handleDeleteComment(comment._id)}>
+                                                Delete
+                                            </Button>
+                                        )}
                                     </Card.Body>
                                 </Card>
                             ))

@@ -64,12 +64,13 @@ export default function Blogs() {
 
     // Handle Edit Blog Modal
     const handleEditBlog = (blog) => {
-        setSelectedBlog(blog);
-        setTitle(blog.title);
-        setContent(blog.content);
-        setEditBlogId(blog._id);  // Make sure to set the blog's ID here
-        setShowModal(true);
+        setSelectedBlog(blog); // Ensure the blog object is being passed correctly
+        setTitle(blog.title); // Set title for the modal input
+        setContent(blog.content); // Set content for the modal input
+        setEditBlogId(blog._id);  // Set the blog ID for updating
+        setShowModal(true); // Show the modal
     };
+    
 
     // Handle Submit (Add or Update Blog)
     const handleSubmit = (e) => {

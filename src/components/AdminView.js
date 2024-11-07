@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Modal, Form, Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { Notyf } from 'notyf';
 import { jwtDecode } from 'jwt-decode';
 
@@ -295,22 +296,24 @@ const AdminView = ({ blogsData, fetchData }) => {
         <Col key={blog._id} sm={12} md={6} lg={4}>
             <Card className="my-3">
                 <Card.Body>
-    <Card.Title>{blog.title}</Card.Title>
-    <Card.Text>{blog.content.substring(0, 100)}...</Card.Text>
-    <Card.Text><strong>Author:</strong> {blog.author ? blog.author.name : 'Unknown'}</Card.Text> {/* Safely accessing author */}
-    <Card.Text><strong>Creation Date:</strong> {new Date(blog.creationDate).toLocaleDateString()}</Card.Text> {/* Safely formatting the creation date */}
-    <div className="text-center">
-        <Button variant="warning" onClick={() => handleEdit(blog)}>Edit</Button>
-        <Button variant="danger" onClick={() => handleDelete(blog._id)} className="ms-2">Delete</Button>
-        <Button variant="info" onClick={() => handleShowCommentModal(blog._id)} className="ms-2">Comment</Button>
-    </div>
-</Card.Body>
-
+                    <Card.Title>{blog.title}</Card.Title>
+                    <Card.Text><strong>Author:</strong> {blog.author._id}</Card.Text>
+                    <Card.Subtitle className="mb-2 text-muted">Content: {blog.content}</Card.Subtitle>
+                      <Card.Subtitle className="mb-2 text-muted">Comment: {blog.comments.length}</Card.Subtitle>
+                    <Card.Text><strong>Creation Date:</strong> {new Date(blog.createdAt).toLocaleDateString()}</Card.Text>
+                    <div className="text-center">
+                        <Button variant="warning" onClick={() => handleEdit(blog)}>Edit</Button>
+                        <Button variant="danger" onClick={() => handleDelete(blog._id)} className="ms-2">Delete</Button>
+                        {/* Details Button */}
+                        <Link to={`/blogs/${blog._id}`} className="btn btn-primary ms-2">
+                            Details
+                        </Link>
+                    </div>
+                </Card.Body>
             </Card>
         </Col>
     ))}
 </Row>
-
         </div>
     );
 };
