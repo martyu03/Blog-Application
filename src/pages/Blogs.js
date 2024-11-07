@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Button, Container, Row, Col, Modal, Form } from 'react-bootstrap';
 import UserContext from '../context/UserContext';
 import BlogCard from '../components/BlogCard'; // Import BlogCard component
+import AdminView from '../components/AdminView'; // Ensure this component is available
 import { Notyf } from 'notyf';
 import '../App.css';
 
@@ -12,7 +13,6 @@ export default function Blogs() {
     const [selectedBlog, setSelectedBlog] = useState(null);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [author, setAuthor] = useState('');
     const [editBlogId, setEditBlogId] = useState(null);
     const notyf = new Notyf();
 
@@ -94,7 +94,6 @@ export default function Blogs() {
                 notyf.success(selectedBlog ? 'Blog Updated' : 'Blog Added');
                 setTitle('');
                 setContent('');
-                setAuthor('');
                 fetchBlogs(); 
                 setShowModal(false);
             } else {
@@ -105,7 +104,6 @@ export default function Blogs() {
             notyf.error('An error occurred while saving the blog');
         });
     };
-    
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -116,46 +114,55 @@ export default function Blogs() {
 
     return (
         <Container>
-            <Row>
-                <Col xs={12} className="mb-4 text-center">
-                    <h1>My Blogs</h1>
-                    {/* Add Blog Button */}
-                    <Button variant="success" onClick={() => setShowModal(true)}>
-                        Add Blog
-                    </Button>
-                </Col>
-            </Row>
-
-             {/* Display Blogs */}
-             <Row>
-                {blogs.length > 0 ? (
-                    blogs.map((blog) => (
-                        <Col key={blog._id} md={4} className="mb-4">
-                            <BlogCard blogProp={blog} />
-                            <div className="d-flex justify-content-between">
-                                <Button
-                                    variant="warning"
-                                    onClick={() => handleEditBlog(blog)}
-                                    className="mt-2 mb-3"
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    variant="danger"
-                                    onClick={() => handleDelete(blog._id)}
-                                    className="mt-2 mb-3"
-                                >
-                                    Delete
-                                </Button>
-                            </div>
-                        </Col>
-                    ))
+            <div>
+                {user && user.isAdmin ? (
+                    // Admin view to manage all blogs
+                    <AdminView blogsData={blogs} fetchData={fetchBlogs} />
                 ) : (
-                    <Col>
-                        <p>No blogs available.</p>
-                    </Col>
+                    <>
+                        <Row>
+                            <Col xs={12} className="mb-4 text-center">
+                                <h1>My Blogs</h1>
+                                {/* Add Blog Button */}
+                                <Button variant="success" onClick={() => setShowModal(true)}>
+                                    Add Blog
+                                </Button>
+                            </Col>
+                        </Row>
+                        {/* Display Blogs */}
+                        <Row>
+                            {blogs.length > 0 ? (
+                                blogs.map((blog) => (
+                                    <Col key={blog._id} md={4} className="mb-4">
+                                        <BlogCard blogProp={blog} />
+                                        <div className="d-flex justify-content-between">
+                                            <Button
+                                                variant="warning"
+                                                onClick={() => handleEditBlog(blog)}
+                                                className="mt-2 mb-3"
+                                            >
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => handleDelete(blog._id)}
+                                                className="mt-2 mb-3"
+                                            >
+                                                Delete
+                                            </Button>
+                                        </div>
+                                    </Col>
+                                ))
+                            ) : (
+                                <Col>
+                                    <p>No blogs available.</p>
+                                </Col>
+                            )}
+                        </Row>
+                    </>
                 )}
-            </Row>
+            </div>
+
             {/* Modal for Blog Details */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
