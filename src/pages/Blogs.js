@@ -70,39 +70,58 @@ export default function Blogs() {
         setEditBlogId(blog._id);  // Set the blog ID for updating
         setShowModal(true); // Show the modal
     };
-    
 
-    // Handle Submit (Add or Update Blog)
-    const handleSubmit = (e) => {
-        e.preventDefault();
-    
-        const method = selectedBlog ? 'PUT' : 'POST'; 
-        const url = selectedBlog
-            ? `${process.env.REACT_APP_API_BASE_URL}/blogs/updateBlog/${editBlogId}` 
-            : `${process.env.REACT_APP_API_BASE_URL}/blogs/addBlog`; 
-    
-        fetch(url, {
-            method,
+    // Handle Submit (Add Blog)
+    const handleAddBlog = () => {
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/addBlog`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}` 
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
-            body: JSON.stringify({ title, content }) 
+            body: JSON.stringify({ title, content })
         })
         .then(res => res.json())
         .then(data => {
             if (data) {
-                notyf.success(selectedBlog ? 'Blog Updated' : 'Blog Added');
+                notyf.success('Blog Added');
                 setTitle('');
                 setContent('');
-                fetchBlogs(); 
+                fetchBlogs();
                 setShowModal(false);
             } else {
-                notyf.error('Failed to save blog');
+                notyf.error('Failed to add blog');
             }
         })
         .catch(error => {
-            notyf.error('An error occurred while saving the blog');
+            notyf.error('An error occurred while adding the blog');
+        });
+    };
+
+    // Handle Submit (Update Blog)
+    const handleUpdateBlog = () => {
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/blogs/updateBlog/${editBlogId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ title, content })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data) {
+                notyf.success('Blog Updated');
+                setTitle('');
+                setContent('');
+                fetchBlogs();
+                setShowModal(false);
+            } else {
+                notyf.error('Failed to update blog');
+            }
+        })
+        .catch(error => {
+            notyf.error('An error occurred while updating the blog');
         });
     };
 
@@ -169,7 +188,14 @@ export default function Blogs() {
                     <Modal.Title>{selectedBlog ? 'Edit Blog' : 'Add Blog'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={handleSubmit}>
+                    <Form onSubmit={(e) => {
+                        e.preventDefault();
+                        if (selectedBlog) {
+                            handleUpdateBlog(); // Update blog if it's selected
+                        } else {
+                            handleAddBlog(); // Add blog if it's not selected
+                        }
+                    }}>
                         <Form.Group>
                             <Form.Label>Title</Form.Label>
                             <Form.Control
