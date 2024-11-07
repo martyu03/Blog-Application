@@ -62,12 +62,9 @@ export default function BlogDetails() {
                             </div>
 
                             {/* Removed the Card.Img for the image */}
-                            <Card.Text>{blog.content}</Card.Text> {/* Show the blog content */}
-                            
-                            <Card.Subtitle>Author:</Card.Subtitle>
-
+                            <Card.Text>{blog.content}</Card.Text> 
+                            <Card.Subtitle className="mb-2 text-muted">Author: {blog.author._id}</Card.Subtitle>
                             <div className='d-flex justify-content-between'>
-                                {/* <Card.Text>{blog.author.username} ({blog.author.email})</Card.Text> */}
                                 <Card.Text>{new Date(blog.createdAt).toLocaleString()}</Card.Text> {/* Show the creation date */}
                             </div>
                         </Card.Body>

@@ -75,7 +75,7 @@ export default function Blogs() {
     const handleSubmit = (e) => {
         e.preventDefault();
     
-        const method = selectedBlog ? 'PUT' : 'POST'; // If editing, use PUT, else POST
+        const method = selectedBlog ? 'PUT' : 'POST'; 
         const url = selectedBlog
             ? `${process.env.REACT_APP_API_BASE_URL}/blogs/updateBlog/${editBlogId}` 
             : `${process.env.REACT_APP_API_BASE_URL}/blogs/addBlog`; 
@@ -116,7 +116,6 @@ export default function Blogs() {
         <Container>
             <div>
                 {user && user.isAdmin ? (
-                    // Admin view to manage all blogs
                     <AdminView blogsData={blogs} fetchData={fetchBlogs} />
                 ) : (
                     <>
