@@ -1,16 +1,15 @@
 // src/components/UserView.js
 import React from 'react';
-import BlogCard from './BlogCard';  // Change from MovieCard to BlogCard
-import BlogSearch from './BlogSearch'; // Assuming this component is also updated
+import BlogCard from './BlogCard';
 import { Row } from 'react-bootstrap';
 
-const UserView = ({ blogsData }) => {  // Change moviesData to blogsData
+const UserView = ({ blogsData, onDelete }) => { // Add onDelete as a prop
     return (
-        <>
-            {blogsData.map(blog => (  // Change movie to blog
-                <BlogCard key={blog._id} blogProp={blog} />  // Change movieProp to blogProp
+        <Row>
+            {blogsData.map(blog => (
+                <BlogCard key={blog._id} blogProp={blog} onDelete={onDelete} /> // Pass onDelete to BlogCard
             ))}
-        </>
+        </Row>
     );
 }
 

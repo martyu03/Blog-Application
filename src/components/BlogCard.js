@@ -20,12 +20,6 @@ export default function BlogCard({ blogProp }) {
                 <Card.Subtitle className="mb-2 text-muted">Comment: {comments.length}</Card.Subtitle>
                 <Card.Subtitle className="mb-2 text-muted">Created on: {new Date(createdAt).toLocaleDateString()}</Card.Subtitle>
                 <Card.Text>{content}</Card.Text>
-                {/* {comments && (
-                    <>
-                        <Card.Subtitle>comments:</Card.Subtitle>
-                        <Card.Text>{comments}</Card.Text>
-                    </>
-                )} */}
                 <Link className="btn btn-primary" to={`/blogs/${_id}`}>Details</Link>
             </Card.Body>
         </Card>
