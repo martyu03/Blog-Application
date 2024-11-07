@@ -98,7 +98,7 @@ export default function BlogDetails() {
                             </div>
                         </Card.Body>
                     </Card>
-                    <h5 className='text-light mt-3 fw-bold'>Comments</h5>
+                    <h5 className='text-bold-black mt-3'>Comments</h5>
                     <AddComment id="addComment" blogId={id} onAddComment={handleAddComment} /> {/* Pass blogId instead of movieId */}
                     <div className="mt-3 pb-3">
                         {comments.length > 0 ? (
@@ -127,7 +127,7 @@ export default function BlogDetails() {
                                 </Card>
                             ))
                         ) : (
-                            <p className='text-light'>No comments yet.</p>
+                            <p className='text-bold-black'>No comments yet.</p>
                         )}
                     </div>
                 </div>
