@@ -109,7 +109,7 @@ const AdminView = ({ blogsData, fetchData }) => {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.message === 'Blog deleted successfully') {
+                if (data) {
                     notyf.success('Blog Deleted');
                     fetchData(); // Call fetchData only after a successful response
                 } else {
